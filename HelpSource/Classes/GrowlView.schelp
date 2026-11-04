@@ -1,0 +1,22 @@
+TITLE:: GrowlView
+summary:: Growl's display
+categories:: Libraries>Growl
+related:: Classes/Growl, Classes/FxParamView, Classes/FxParamPanel
+
+DESCRIPTION::
+What link::Classes/FxParamPanel:: puts at the top of Growl's window. In it, drag a curve up and down for that stage's drive; the wheel on a curve for its bias; drag a matrix cell for how much that source moves that destination; double click a cell to clear it.
+
+It draws from the object's settings and the replies its meters bring, so it is only live while the window is running; link::Classes/FxParamView:: has the rest.
+
+CLASSMETHODS::
+
+METHOD:: new
+ARGUMENT:: unit
+The link::Classes/Growl::.
+ARGUMENT:: parent
+A view to go in.
+
+INSTANCEMETHODS::
+
+METHOD:: hint
+What the hint bar says over it.

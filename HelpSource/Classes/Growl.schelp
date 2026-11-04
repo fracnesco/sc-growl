@@ -1,0 +1,114 @@
+TITLE:: Growl
+summary:: three stages of saturation, routed, fed back and modulated, as a UGen and as an object, with a window
+categories:: Libraries>Growl
+related:: Classes/FxParamUnit, Classes/GrowlView, Classes/FxUnit, Classes/FxChain
+
+DESCRIPTION::
+Three stages of saturation that can be routed, fed back and modulated - a colouring distortion in the spirit of Ableton's Roar, running anywhere a UGen does, with a window.
+
+code::
+Ndef(\bass, { Growl.ar(LFSaw.ar([55, 55.3]) * 0.3, \growl) }).play;
+
+g = Growl(Ndef(\bass), \growl);
+g.gui;
+g.preset = \snarl;
+g.routing = \multiband;
+g.type1 = \fold; g.drive1 = 18;
+g.setMod(\lfo1, \freq1, 0.3);    // the first lfo moves stage 1's filter
+::
+
+Each stage is a shaper and a filter after it. There are ten shapers: soft, sine, fold, clip, diode, tube, rect, crush, fractal, noise. The window draws each one with the same functions the server runs, so what you see is the curve you get; code::Growl.shape:: gives you the numbers, and that is the one thing this extension has to get right. Two types do something a curve cannot show: crush also drops the sample rate, and noise adds noise that follows the signal.
+
+The routing says what the stages hear. code::single:: uses stage 1. code::serial:: runs them one after another. code::parallel:: puts all three on the input. code::multiband:: gives them a low, a middle and a high band, split by Linkwitz-Riley crossovers at code::xLow:: and code::xHigh::. code::midside:: puts stage 1 on the middle and stage 2 on the sides.
+
+Feedback runs the output back to the input through a delay. The stages' own gain is taken out of the loop, so code::feedback:: means the same at any drive: under 100% it dies away, and over 100% it sustains until code::fbGate:: or a bypass closes it.
+
+Four sources (code::lfo1::, code::lfo2::, code::env::, code::noise::) move eight destinations (code::drive1..3::, code::freq1..3::, code::feedback::, code::tone::) through a matrix. Set it by dragging its cells, or with code::setMod::.
+
+There is no oversampling, since SuperCollider has none built in, so high drive on a bright signal aliases. It costs about 4% of one core on an M4 Pro at stereo, the most of this family: all ten shapers and seven filters run on all three stages, whichever you have selected.
+
+subsection:: The object and the UGen
+It is an link::Classes/FxParamUnit::, so everything that class documents works here: code::Growl.ar(in, name)::, code::Growl(node, name)::, code::Growl.onBus(bus, numChannels)::, presets, the clipboard, code::gui::. Its window's display is a link::Classes/GrowlView::.
+
+subsection:: Parameters
+Each is a property of the object: read it, set it. The numbers are in the order of the node's control, which is what saved node maps carry. Internal ones without a knob, if any, are described above.
+
+table::
+## strong::parameter:: || strong::range:: || strong::default:: || strong::what it does::
+## code::input:: || -24 .. 24 dB || 0 || the level into the stages
+## code::routing:: || single serial parallel multiband midside || single || single: one stage; serial: 1 then 2 then 3; parallel: all three on the input; multiband: low, mid, high; midside: 1 on the middle, 2 on the sides
+## code::xLow:: || 40 .. 1000 Hz || 200 || multiband: between stage 1 and stage 2
+## code::xHigh:: || 800 .. 12000 Hz || 2500 || multiband: between stage 2 and stage 3
+## code::tone:: || 200 .. 20000 Hz || 20000 || a low pass over everything that comes out
+## code::squash:: || 0 .. 1 || 0 || a compressor over everything that comes out: more is flatter
+## code::type1:: || soft sine fold clip diode tube rect crush fractal noise || soft || which curve: the display draws it
+## code::drive1:: || 0 .. 48 dB || 12 || how hard the signal hits the curve, in dB
+## code::bias1:: || -1 .. 1 || 0 || shifts the signal along the curve: asymmetry, and so even harmonics
+## code::filter1:: || off lp hp bp notch comb ladder || off || the filter after the shaper
+## code::freq1:: || 20 .. 18000 Hz || 1800 || the filter's frequency - or the comb's pitch
+## code::res1:: || 0 .. 1 || 0.3 || the filter's resonance - or how long the comb rings
+## code::level1:: || -36 .. 12 dB || -6 || what comes out of this stage, in dB
+## code::type2:: || soft sine fold clip diode tube rect crush fractal noise || fold || which curve: the display draws it
+## code::drive2:: || 0 .. 48 dB || 12 || how hard the signal hits the curve, in dB
+## code::bias2:: || -1 .. 1 || 0 || shifts the signal along the curve: asymmetry, and so even harmonics
+## code::filter2:: || off lp hp bp notch comb ladder || off || the filter after the shaper
+## code::freq2:: || 20 .. 18000 Hz || 1800 || the filter's frequency - or the comb's pitch
+## code::res2:: || 0 .. 1 || 0.3 || the filter's resonance - or how long the comb rings
+## code::level2:: || -36 .. 12 dB || -12 || what comes out of this stage, in dB
+## code::type3:: || soft sine fold clip diode tube rect crush fractal noise || sine || which curve: the display draws it
+## code::drive3:: || 0 .. 48 dB || 12 || how hard the signal hits the curve, in dB
+## code::bias3:: || -1 .. 1 || 0 || shifts the signal along the curve: asymmetry, and so even harmonics
+## code::filter3:: || off lp hp bp notch comb ladder || off || the filter after the shaper
+## code::freq3:: || 20 .. 18000 Hz || 1800 || the filter's frequency - or the comb's pitch
+## code::res3:: || 0 .. 1 || 0.3 || the filter's resonance - or how long the comb rings
+## code::level3:: || -36 .. 12 dB || -12 || what comes out of this stage, in dB
+## code::feedback:: || 0 .. 1.1 || 0 || how much goes round again, whatever the drive: under 100 it dies away, past it sustains on its own
+## code::fbTime:: || 0.002 .. 1 s || 0.03 || the delay in the loop: short pitches, long echoes
+## code::fbTone:: || 100 .. 20000 Hz || 6000 || a low pass in the loop
+## code::fbGate:: || -96 .. 0 dB || -96 || the loop closes when the input falls under this - so a sustaining loop still stops
+## code::mix:: || 0 .. 1 || 1 || how much of the effect goes out, against the dry signal
+## code::output:: || -36 .. 24 dB || 0 || the level of the whole thing, in dB
+## code::lfo1Shape:: || sine triangle sawUp sawDown square sampleHold noise || sine || the first lfo's shape
+## code::lfo1Rate:: || 0.01 .. 30 Hz || 1 || the first lfo's speed
+## code::lfo2Shape:: || sine triangle sawUp sawDown square sampleHold noise || sampleHold || the second lfo's shape
+## code::lfo2Rate:: || 0.01 .. 30 Hz || 4 || the second lfo's speed
+## code::envGain:: || -12 .. 36 dB || 12 || how much the envelope follower is given
+## code::envRel:: || 0.01 .. 2 s || 0.15 || how quickly the follower falls
+## code::noiseRate:: || 0.1 .. 100 Hz || 8 || the speed of the noise source
+::
+
+CLASSMETHODS::
+
+METHOD:: shape
+what the level x comes out as through a shape, in numbers: the arithmetic the server runs.
+ARGUMENT:: x
+ARGUMENT:: type
+ARGUMENT:: drive
+ARGUMENT:: bias
+
+INSTANCEMETHODS::
+
+METHOD:: setMod
+how much a source moves a destination, -1..1: sources are lfo1, lfo2, env, noise; destinations drive1, drive2, drive3, freq1, freq2, freq3, feedback, tone.
+ARGUMENT:: source
+ARGUMENT:: dest
+ARGUMENT:: amount
+
+METHOD:: getMod
+what setMod set.
+ARGUMENT:: source
+ARGUMENT:: dest
+
+METHOD:: clearMods
+take every source off every destination.
+
+EXAMPLES::
+
+code::
+s.boot;
+Ndef(\bass, { Growl.ar(LFSaw.ar([55, 55.3]) * 0.3, \growl) }).play;
+g = Growl(Ndef(\bass), \growl);
+g.gui;
+g.preset = Growl.presetNames.choose;
+g.free; Ndef(\bass).clear;
+::
