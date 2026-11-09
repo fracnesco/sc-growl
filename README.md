@@ -64,15 +64,19 @@ It needs more than a stock server's 64 wire buffers above 4 channels: `s.options
 
 ## The window
 
-`g.gui` opens the top row (on, presets, save, copy, paste), the display, and a row of knobs per section. Hover over anything and the bar at the bottom says what it does.
+`g.gui` opens it as a device, in three parts.
 
-In the display, drag a curve up and down for that stage's drive; the wheel on a curve for its bias; drag a matrix cell for how much that source moves that destination; double click a cell to clear it.
+Along the top: the power button, the name, the presets (`<` and `>` step through them, and a `*` after the name means you have moved something since you chose it), save, and `...` for save as, delete, copy, paste, back to the defaults and the hints. Under it, the display, with the in and out meters at its right. Under that, the controls, on three pages - drive, feedback, modulation - with the output card (tone, squash, mix, output) at the right of every page. Hover over anything and the bar at the bottom says what it does.
+
+The drive page holds the input card (input, routing and the multiband crossovers) and one stage card at a time: click 1, 2 or 3 on it, or click a curve in the display. Each stage has its own colour, on its curve, its card and its knobs. A control that does nothing with the settings as they are is dimmed: the crossovers outside multiband, stages 2 and 3 in single (and 3 in midside), a stage's freq and res while its filter is off, an lfo's rate while it follows Tidal's clock, the loop's time, tone and gate while feedback is 0.
+
+In the display, click a curve to show its stage, drag it up and down for its drive (shift: fine), and turn the wheel on it for its bias. Drag a cell of the matrix up and down for how much that source moves that destination; double click a cell to clear it. On any knob: drag up and down (shift: fine), the wheel, double click for its default, click its value to type one (`2.5k`, `120`, `e2`), right click for a menu.
 
 ## Presets
 
 Built in: default, warm tape, bent fifths, three bands, snarl, wide sides, wasp, howl round, dirty dub.
 
-Yours go in `Platform.userAppSupportDir/growl-presets.scd`: `g.saveAsPreset("mine")`, or type a name in the window and press save. `g.copySettings` and `other.pasteSettings` carry settings from one to another.
+Yours go in `Platform.userAppSupportDir/growl-presets.scd`: `g.saveAsPreset("mine")`, or press save in the window and give it a name. `g.copySettings` and `other.pasteSettings` carry settings from one to another.
 
 ## Parameters
 
@@ -80,46 +84,48 @@ Every parameter is a property: `g.input`, `g.input = ...`. These also work by na
 
 | parameter | section | range | default | what it does |
 |---|---|---|---|---|
-| `input` | main | -24 .. 24 dB | 0 | the level into the stages |
-| `routing` | main | single serial parallel multiband midside | single | single: one stage; serial: 1 then 2 then 3; parallel: all three on the input; multiband: low, mid, high; midside: 1 on the middle, 2 on the sides |
-| `xLow` | main | 40 .. 1000 Hz | 200 | multiband: between stage 1 and stage 2 |
-| `xHigh` | main | 800 .. 12000 Hz | 2500 | multiband: between stage 2 and stage 3 |
-| `tone` | main | 200 .. 20000 Hz | 20000 | a low pass over everything that comes out |
-| `squash` | main | 0 .. 1 | 0 | a compressor over everything that comes out: more is flatter |
+| `input` | input | -24 .. 24 dB | 0 | the level into the stages |
+| `routing` | input | single serial parallel multiband midside | single | single: one stage; serial: 1 then 2 then 3; parallel: all three on the input; multiband: low, mid, high; midside: 1 on the middle, 2 on the sides |
+| `xLow` | input | 40 .. 1000 Hz | 200 | multiband: between stage 1 and stage 2 |
+| `xHigh` | input | 800 .. 12000 Hz | 2500 | multiband: between stage 2 and stage 3 |
+| `tone` | output | 200 .. 20000 Hz | 20000 | a low pass over everything that comes out |
+| `squash` | output | 0 .. 1 | 0 | a compressor over everything that comes out: more is flatter |
 | `type1` | stage 1 | soft sine fold clip diode tube rect crush fractal noise | soft | which curve: the display draws it |
-| `drive1` | stage 1 | 0 .. 48 dB | 12 | how hard the signal hits the curve, in dB |
-| `bias1` | stage 1 | -1 .. 1 | 0 | shifts the signal along the curve: asymmetry, and so even harmonics |
+| `drive1` | stage 1 | 0 .. 48 dB | 12 | how hard the signal hits the curve - or drag the curve up and down |
+| `bias1` | stage 1 | -1 .. 1 | 0 | shifts the signal along the curve: asymmetry, and so even harmonics - or the wheel on the curve |
 | `filter1` | stage 1 | off lp hp bp notch comb ladder | off | the filter after the shaper |
 | `freq1` | stage 1 | 20 .. 18000 Hz | 1800 | the filter's frequency - or the comb's pitch |
 | `res1` | stage 1 | 0 .. 1 | 0.3 | the filter's resonance - or how long the comb rings |
-| `level1` | stage 1 | -36 .. 12 dB | -6 | what comes out of this stage, in dB |
+| `level1` | stage 1 | -36 .. 12 dB | -6 | what comes out of this stage |
 | `type2` | stage 2 | soft sine fold clip diode tube rect crush fractal noise | fold | which curve: the display draws it |
-| `drive2` | stage 2 | 0 .. 48 dB | 12 | how hard the signal hits the curve, in dB |
-| `bias2` | stage 2 | -1 .. 1 | 0 | shifts the signal along the curve: asymmetry, and so even harmonics |
+| `drive2` | stage 2 | 0 .. 48 dB | 12 | how hard the signal hits the curve - or drag the curve up and down |
+| `bias2` | stage 2 | -1 .. 1 | 0 | shifts the signal along the curve: asymmetry, and so even harmonics - or the wheel on the curve |
 | `filter2` | stage 2 | off lp hp bp notch comb ladder | off | the filter after the shaper |
 | `freq2` | stage 2 | 20 .. 18000 Hz | 1800 | the filter's frequency - or the comb's pitch |
 | `res2` | stage 2 | 0 .. 1 | 0.3 | the filter's resonance - or how long the comb rings |
-| `level2` | stage 2 | -36 .. 12 dB | -12 | what comes out of this stage, in dB |
+| `level2` | stage 2 | -36 .. 12 dB | -12 | what comes out of this stage |
 | `type3` | stage 3 | soft sine fold clip diode tube rect crush fractal noise | sine | which curve: the display draws it |
-| `drive3` | stage 3 | 0 .. 48 dB | 12 | how hard the signal hits the curve, in dB |
-| `bias3` | stage 3 | -1 .. 1 | 0 | shifts the signal along the curve: asymmetry, and so even harmonics |
+| `drive3` | stage 3 | 0 .. 48 dB | 12 | how hard the signal hits the curve - or drag the curve up and down |
+| `bias3` | stage 3 | -1 .. 1 | 0 | shifts the signal along the curve: asymmetry, and so even harmonics - or the wheel on the curve |
 | `filter3` | stage 3 | off lp hp bp notch comb ladder | off | the filter after the shaper |
 | `freq3` | stage 3 | 20 .. 18000 Hz | 1800 | the filter's frequency - or the comb's pitch |
 | `res3` | stage 3 | 0 .. 1 | 0.3 | the filter's resonance - or how long the comb rings |
-| `level3` | stage 3 | -36 .. 12 dB | -12 | what comes out of this stage, in dB |
+| `level3` | stage 3 | -36 .. 12 dB | -12 | what comes out of this stage |
 | `feedback` | feedback | 0 .. 1.1 | 0 | how much goes round again, whatever the drive: under 100 it dies away, past it sustains on its own |
 | `fbTime` | feedback | 0.002 .. 1 s | 0.03 | the delay in the loop: short pitches, long echoes |
 | `fbTone` | feedback | 100 .. 20000 Hz | 6000 | a low pass in the loop |
 | `fbGate` | feedback | -96 .. 0 dB | -96 | the loop closes when the input falls under this - so a sustaining loop still stops |
-| `mix` | feedback | 0 .. 1 | 1 | how much of the effect goes out, against the dry signal |
-| `output` | feedback | -36 .. 24 dB | 0 | the level of the whole thing, in dB |
-| `lfo1Shape` | modulators | sine triangle sawUp sawDown square sampleHold noise | sine | the first lfo's shape |
-| `lfo1Rate` | modulators | 0.01 .. 30 Hz | 1 | the first lfo's speed |
-| `lfo2Shape` | modulators | sine triangle sawUp sawDown square sampleHold noise | sampleHold | the second lfo's shape |
-| `lfo2Rate` | modulators | 0.01 .. 30 Hz | 4 | the second lfo's speed |
-| `envGain` | modulators | -12 .. 36 dB | 12 | how much the envelope follower is given |
-| `envRel` | modulators | 0.01 .. 2 s | 0.15 | how quickly the follower falls |
-| `noiseRate` | modulators | 0.1 .. 100 Hz | 8 | the speed of the noise source |
+| `mix` | output | 0 .. 1 | 1 | how much of the effect goes out, against the dry signal |
+| `output` | output | -36 .. 24 dB | 0 | the level of the whole thing, in dB |
+| `lfo1Shape` | lfo 1 | sine triangle sawUp sawDown square sampleHold noise | sine | the first lfo's shape |
+| `lfo1Rate` | lfo 1 | 0.01 .. 30 Hz | 1 | the first lfo's speed |
+| `lfo2Shape` | lfo 2 | sine triangle sawUp sawDown square sampleHold noise | sampleHold | the second lfo's shape |
+| `lfo2Rate` | lfo 2 | 0.01 .. 30 Hz | 4 | the second lfo's speed |
+| `envGain` | envelope | -12 .. 36 dB | 12 | how much the envelope follower is given |
+| `envRel` | envelope | 0.01 .. 2 s | 0.15 | how quickly the follower falls |
+| `noiseRate` | noise | 0.1 .. 100 Hz | 8 | the speed of the noise source |
+| `lfo1Sync` | lfo 1 | free four two one half quarter eighth sixteenth third sixth twelfth | free | lfo 1 free, at its rate - or one period every so many cycles of Tidal's clock |
+| `lfo2Sync` | lfo 2 | free four two one half quarter eighth sixteenth third sixth twelfth | free | lfo 2 free, at its rate - or one period every so many cycles of Tidal's clock |
 
 ## Files
 

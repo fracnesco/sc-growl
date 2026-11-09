@@ -42,26 +42,26 @@ table::
 ## code::tone:: || 200 .. 20000 Hz || 20000 || a low pass over everything that comes out
 ## code::squash:: || 0 .. 1 || 0 || a compressor over everything that comes out: more is flatter
 ## code::type1:: || soft sine fold clip diode tube rect crush fractal noise || soft || which curve: the display draws it
-## code::drive1:: || 0 .. 48 dB || 12 || how hard the signal hits the curve, in dB
-## code::bias1:: || -1 .. 1 || 0 || shifts the signal along the curve: asymmetry, and so even harmonics
+## code::drive1:: || 0 .. 48 dB || 12 || how hard the signal hits the curve - or drag the curve up and down
+## code::bias1:: || -1 .. 1 || 0 || shifts the signal along the curve: asymmetry, and so even harmonics - or the wheel on the curve
 ## code::filter1:: || off lp hp bp notch comb ladder || off || the filter after the shaper
 ## code::freq1:: || 20 .. 18000 Hz || 1800 || the filter's frequency - or the comb's pitch
 ## code::res1:: || 0 .. 1 || 0.3 || the filter's resonance - or how long the comb rings
-## code::level1:: || -36 .. 12 dB || -6 || what comes out of this stage, in dB
+## code::level1:: || -36 .. 12 dB || -6 || what comes out of this stage
 ## code::type2:: || soft sine fold clip diode tube rect crush fractal noise || fold || which curve: the display draws it
-## code::drive2:: || 0 .. 48 dB || 12 || how hard the signal hits the curve, in dB
-## code::bias2:: || -1 .. 1 || 0 || shifts the signal along the curve: asymmetry, and so even harmonics
+## code::drive2:: || 0 .. 48 dB || 12 || how hard the signal hits the curve - or drag the curve up and down
+## code::bias2:: || -1 .. 1 || 0 || shifts the signal along the curve: asymmetry, and so even harmonics - or the wheel on the curve
 ## code::filter2:: || off lp hp bp notch comb ladder || off || the filter after the shaper
 ## code::freq2:: || 20 .. 18000 Hz || 1800 || the filter's frequency - or the comb's pitch
 ## code::res2:: || 0 .. 1 || 0.3 || the filter's resonance - or how long the comb rings
-## code::level2:: || -36 .. 12 dB || -12 || what comes out of this stage, in dB
+## code::level2:: || -36 .. 12 dB || -12 || what comes out of this stage
 ## code::type3:: || soft sine fold clip diode tube rect crush fractal noise || sine || which curve: the display draws it
-## code::drive3:: || 0 .. 48 dB || 12 || how hard the signal hits the curve, in dB
-## code::bias3:: || -1 .. 1 || 0 || shifts the signal along the curve: asymmetry, and so even harmonics
+## code::drive3:: || 0 .. 48 dB || 12 || how hard the signal hits the curve - or drag the curve up and down
+## code::bias3:: || -1 .. 1 || 0 || shifts the signal along the curve: asymmetry, and so even harmonics - or the wheel on the curve
 ## code::filter3:: || off lp hp bp notch comb ladder || off || the filter after the shaper
 ## code::freq3:: || 20 .. 18000 Hz || 1800 || the filter's frequency - or the comb's pitch
 ## code::res3:: || 0 .. 1 || 0.3 || the filter's resonance - or how long the comb rings
-## code::level3:: || -36 .. 12 dB || -12 || what comes out of this stage, in dB
+## code::level3:: || -36 .. 12 dB || -12 || what comes out of this stage
 ## code::feedback:: || 0 .. 1.1 || 0 || how much goes round again, whatever the drive: under 100 it dies away, past it sustains on its own
 ## code::fbTime:: || 0.002 .. 1 s || 0.03 || the delay in the loop: short pitches, long echoes
 ## code::fbTone:: || 100 .. 20000 Hz || 6000 || a low pass in the loop
@@ -75,6 +75,8 @@ table::
 ## code::envGain:: || -12 .. 36 dB || 12 || how much the envelope follower is given
 ## code::envRel:: || 0.01 .. 2 s || 0.15 || how quickly the follower falls
 ## code::noiseRate:: || 0.1 .. 100 Hz || 8 || the speed of the noise source
+## code::lfo1Sync:: || free four two one half quarter eighth sixteenth third sixth twelfth || free || lfo 1 free, at its rate - or one period every so many cycles of Tidal's clock
+## code::lfo2Sync:: || free four two one half quarter eighth sixteenth third sixth twelfth || free || lfo 2 free, at its rate - or one period every so many cycles of Tidal's clock
 ::
 
 CLASSMETHODS::

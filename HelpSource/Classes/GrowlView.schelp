@@ -1,10 +1,12 @@
 TITLE:: GrowlView
 summary:: Growl's display
 categories:: Libraries>Growl
-related:: Classes/Growl, Classes/FxParamView, Classes/FxParamPanel
+related:: Classes/Growl, Classes/FxParamView, Classes/FxDevicePanel
 
 DESCRIPTION::
-What link::Classes/FxParamPanel:: puts at the top of Growl's window. In it, drag a curve up and down for that stage's drive; the wheel on a curve for its bias; drag a matrix cell for how much that source moves that destination; double click a cell to clear it.
+What link::Classes/FxDevicePanel:: puts at the top of Growl's window: the three curves at the left, each in its stage's colour, and the modulation matrix at the right.
+
+In it, click a curve to show that stage's card below; drag a curve up and down for that stage's drive (shift: fine); turn the wheel on a curve for its bias. Drag a matrix cell up and down for how much that source moves that destination; double click a cell to clear it. The stage the card shows is framed, a stage the routing silences is dimmed and says "off", and the input's level is shaded behind every curve that is used.
 
 It draws from the object's settings and the replies its meters bring, so it is only live while the window is running; link::Classes/FxParamView:: has the rest.
 
@@ -18,5 +20,15 @@ A view to go in.
 
 INSTANCEMETHODS::
 
+METHOD:: focus
+Which stage is framed, 0 to 2. Setting it only redraws; the panel sets it when its stage card changes.
+
+METHOD:: focusAction
+A function called with the stage's index when a curve is clicked; the panel uses it to show that stage's card.
+
 METHOD:: hint
 What the hint bar says over it.
+ARGUMENT:: x
+The pointer's x in the view, or nil.
+ARGUMENT:: y
+The pointer's y in the view, or nil.
