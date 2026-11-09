@@ -115,6 +115,64 @@ Growl : FxParamUnit {
 		]
 	}
 
+	// ------------------------------------------------------------- the window
+
+	*guiClass { ^FxDeviceGUI }
+	*panelClass { ^FxDevicePanel }
+
+	// each stage's colour, on its curve, its card and its knobs - none of them
+	// the accent (on, modulated) or the signal's blue
+	*stageColour { |i| ^FxPalette.eqBand(#[1, 3, 6].wrapAt(i)) }
+
+	*stageActive { |i, routing|
+		^switch (routing,
+			\single, { i == 0 },
+			\midside, { i < 2 },
+			{ true }
+		)
+	}
+
+	*devicePages {
+		^[
+			\drive -> [
+				\input,
+				(title: "stage", count: 3, colour: { |i| this.stageColour(i) },
+					keys: { |i|
+						var n = i + 1;
+						[[("type" ++ n).asSymbol, ("filter" ++ n).asSymbol]]
+						++ #[\drive, \bias, \freq, \res, \level].collect { |k| (k ++ n).asSymbol }
+					})
+			],
+			\feedback -> [\feedback],
+			\modulation -> ['lfo 1', 'lfo 2', \envelope, \noise]
+		]
+	}
+
+	*isActive { |key, unit|
+		var k = key.asString, n;
+		if (key == \xLow or: { key == \xHigh }) { ^unit.get(\routing) == \multiband };
+		if (key == \lfo1Rate) { ^unit.get(\lfo1Sync) == \free };
+		if (key == \lfo2Rate) { ^unit.get(\lfo2Sync) == \free };
+		if (#[\fbTime, \fbTone, \fbGate].includes(key)) { ^unit.get(\feedback) > 0 };
+		if ("^(type|drive|bias|filter|freq|res|level)[123]$".matchRegexp(k)) {
+			n = k.last.digit;
+			if (this.stageActive(n - 1, unit.get(\routing)).not) { ^false };
+			if (k.beginsWith("freq") or: { k.beginsWith("res") }) {
+				^unit.get(("filter" ++ n).asSymbol) != \off
+			};
+		};
+		^true
+	}
+
+	// what a Tidal pattern may move through SuperDirtGUI, event by event
+	*tidalParams {
+		^[\input, \tone, \squash]
+			++ [1, 2, 3].collect { |i| [\type, \drive, \bias, \filter, \freq, \res, \level].collect { |k| (k ++ i).asSymbol } }.flat
+			++ [\feedback, \fbTime, \fbTone, \lfo1Rate, \lfo2Rate, \lfo1Sync, \lfo2Sync, \mix]
+	}
+
+	*usesTidalClock { ^true }
+
 	*presetList {
 		^[
 			\default, (),
