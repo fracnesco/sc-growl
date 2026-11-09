@@ -40,28 +40,32 @@ Growl : FxParamUnit {
 
 	*hasTail { ^true }
 	*displayClass { ^GrowlView }
-	*windowSize { ^Point(900, 760) }
+	*windowSize { ^Point(1000, 580) }
 
 	*modKey { |source, dest| ^("m_" ++ source ++ "_" ++ dest).asSymbol }
 
 	*params {
+		// labels, sections, sizes and boxes are the window's (sc-fx-ui, 2026-11-08);
+		// the order is the nodeMaps' - append, never reorder
 		var stages = [1, 2, 3].collect { |i|
 			var section = ("stage " ++ i).asSymbol;
 			[
 				this.menu(("type" ++ i).asSymbol, this.shapes, #[\soft, \fold, \sine][i - 1], "shaper",
 					"which curve: the display draws it", section),
 				this.knob(("drive" ++ i).asSymbol, 0, 48, \lin, 12, "dB", "drive",
-					"how hard the signal hits the curve, in dB", section: section, dec: 1),
+					"how hard the signal hits the curve - or drag the curve up and down", section: section, dec: 1,
+					size: \big),
 				this.knob(("bias" ++ i).asSymbol, -1, 1, \lin, 0, "", "bias",
-					"shifts the signal along the curve: asymmetry, and so even harmonics", section: section),
+					"shifts the signal along the curve: asymmetry, and so even harmonics - or the wheel on the curve",
+					section: section, box: \pct, size: \small),
 				this.menu(("filter" ++ i).asSymbol, this.filters, \off, "filter",
 					"the filter after the shaper", section),
 				this.knob(("freq" ++ i).asSymbol, 20, 18000, \exp, 1800, "Hz", "freq",
 					"the filter's frequency - or the comb's pitch", section: section, dec: 0),
 				this.knob(("res" ++ i).asSymbol, 0, 1, \lin, 0.3, "", "res",
-					"the filter's resonance - or how long the comb rings", section: section),
+					"the filter's resonance - or how long the comb rings", section: section, box: \pct, size: \small),
 				this.knob(("level" ++ i).asSymbol, -36, 12, \lin, if (i == 1) { -6 } { -12 }, "dB", "level",
-					"what comes out of this stage, in dB", section: section, dec: 1)
+					"what comes out of this stage", section: section, dec: 1, bipolar: false)
 			]
 		};
 		var matrix = this.sources.collect { |source|
@@ -70,32 +74,44 @@ Growl : FxParamUnit {
 			}
 		};
 		^[
-			this.knob(\input, -24, 24, \lin, 0, "dB", "input", "the level into the stages", section: \main, dec: 1),
+			this.knob(\input, -24, 24, \lin, 0, "dB", "input", "the level into the stages", section: \input, dec: 1),
 			this.menu(\routing, this.routings, \single, "routing",
 				"single: one stage; serial: 1 then 2 then 3; parallel: all three on the input;"
-				" multiband: low, mid, high; midside: 1 on the middle, 2 on the sides", \main),
-			this.knob(\xLow, 40, 1000, \exp, 200, "Hz", "x low", "multiband: between stage 1 and stage 2", section: \main, dec: 0),
-			this.knob(\xHigh, 800, 12000, \exp, 2500, "Hz", "x high", "multiband: between stage 2 and stage 3", section: \main, dec: 0),
-			this.knob(\tone, 200, 20000, \exp, 20000, "Hz", "tone", "a low pass over everything that comes out", section: \main, dec: 0),
-			this.knob(\squash, 0, 1, \lin, 0, "", "squash", "a compressor over everything that comes out: more is flatter", section: \main),
+				" multiband: low, mid, high; midside: 1 on the middle, 2 on the sides", \input),
+			this.knob(\xLow, 40, 1000, \exp, 200, "Hz", "x low", "multiband: between stage 1 and stage 2",
+				section: \input, dec: 0, size: \small),
+			this.knob(\xHigh, 800, 12000, \exp, 2500, "Hz", "x high", "multiband: between stage 2 and stage 3",
+				section: \input, dec: 0, size: \small),
+			this.knob(\tone, 200, 20000, \exp, 20000, "Hz", "tone", "a low pass over everything that comes out",
+				section: \output, dec: 0),
+			this.knob(\squash, 0, 1, \lin, 0, "", "squash", "a compressor over everything that comes out: more is flatter",
+				section: \output, box: \pct),
 			stages,
 			this.knob(\feedback, 0, 1.1, \lin, 0, "", "amount",
 				"how much goes round again, whatever the drive: under 100 it dies away, past it sustains on its own",
-				section: \feedback, box: \pct),
+				section: \feedback, box: \pct, size: \big),
 			this.knob(\fbTime, 0.002, 1, \exp, 0.03, "s", "time", "the delay in the loop: short pitches, long echoes",
 				box: \ms, lag: 0.2, section: \feedback),
-			this.knob(\fbTone, 100, 20000, \exp, 6000, "Hz", "tone", "a low pass in the loop", section: \feedback, dec: 0),
+			this.knob(\fbTone, 100, 20000, \exp, 6000, "Hz", "fb tone", "a low pass in the loop", section: \feedback, dec: 0),
 			this.knob(\fbGate, -96, 0, \lin, -96, "dB", "gate",
-				"the loop closes when the input falls under this - so a sustaining loop still stops", section: \feedback, dec: 0),
-			this.mixParams(\feedback),
-			this.menu(\lfo1Shape, FxLfo.shapes, \sine, "lfo 1", "the first lfo's shape", \modulators),
-			this.knob(\lfo1Rate, 0.01, 30, \exp, 1, "Hz", "rate", "the first lfo's speed", section: \modulators),
-			this.menu(\lfo2Shape, FxLfo.shapes, \sampleHold, "lfo 2", "the second lfo's shape", \modulators),
-			this.knob(\lfo2Rate, 0.01, 30, \exp, 4, "Hz", "rate", "the second lfo's speed", section: \modulators),
-			this.knob(\envGain, -12, 36, \lin, 12, "dB", "env", "how much the envelope follower is given", section: \modulators, dec: 0),
-			this.knob(\envRel, 0.01, 2, \exp, 0.15, "s", "release", "how quickly the follower falls", box: \ms, section: \modulators),
-			this.knob(\noiseRate, 0.1, 100, \exp, 8, "Hz", "noise", "the speed of the noise source", section: \modulators),
-			matrix
+				"the loop closes when the input falls under this - so a sustaining loop still stops",
+				section: \feedback, dec: 0, floorText: "off"),
+			this.mixParams(\output),
+			this.menu(\lfo1Shape, FxLfo.shapes, \sine, "shape", "the first lfo's shape", 'lfo 1'),
+			this.knob(\lfo1Rate, 0.01, 30, \exp, 1, "Hz", "rate", "the first lfo's speed", section: 'lfo 1'),
+			this.menu(\lfo2Shape, FxLfo.shapes, \sampleHold, "shape", "the second lfo's shape", 'lfo 2'),
+			this.knob(\lfo2Rate, 0.01, 30, \exp, 4, "Hz", "rate", "the second lfo's speed", section: 'lfo 2'),
+			this.knob(\envGain, -12, 36, \lin, 12, "dB", "gain", "how much the envelope follower is given",
+				section: \envelope, dec: 0, bipolar: false),
+			this.knob(\envRel, 0.01, 2, \exp, 0.15, "s", "release", "how quickly the follower falls", box: \ms,
+				section: \envelope),
+			this.knob(\noiseRate, 0.1, 100, \exp, 8, "Hz", "speed", "the speed of the noise source", section: \noise),
+			matrix,
+			// appended 2026-11-08: the lfos on Tidal's cycle (FxLfo's sync)
+			this.menu(\lfo1Sync, FxLfo.syncNames, \free, "sync",
+				"lfo 1 free, at its rate - or one period every so many cycles of Tidal's clock", 'lfo 1'),
+			this.menu(\lfo2Sync, FxLfo.syncNames, \free, "sync",
+				"lfo 2 free, at its rate - or one period every so many cycles of Tidal's clock", 'lfo 2')
 		]
 	}
 
@@ -206,8 +222,8 @@ Growl : FxParamUnit {
 
 	*process { |sig, p, ctx|
 		var n = sig.size, source, mods, modOf;
-		var lfo1 = FxLfo.kr(p[\lfo1Shape], p[\lfo1Rate]);
-		var lfo2 = FxLfo.kr(p[\lfo2Shape], p[\lfo2Rate]);
+		var lfo1 = FxLfo.kr(p[\lfo1Shape], p[\lfo1Rate], 0, p[\lfo1Sync]);
+		var lfo2 = FxLfo.kr(p[\lfo2Shape], p[\lfo2Rate], 0, p[\lfo2Sync]);
 		var env = (Amplitude.kr(sig.sum / n, 0.005, p[\envRel]) * p[\envGain].dbamp).clip(0, 1);
 		var noise = LFNoise2.kr(p[\noiseRate]);
 		var loop = FxLoop(n, 1.1);
