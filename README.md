@@ -2,6 +2,8 @@
 
 **Three stages of saturation that can be routed, fed back and modulated - a colouring distortion in the spirit of Ableton's Roar, running anywhere a UGen does, with a window.** A SuperCollider extension.
 
+![Growl's window](images/growl.png)
+
 ```supercollider
 s.boot;
 Ndef(\bass, { Growl.ar(LFSaw.ar([55, 55.3]) * 0.3, \growl) }).play;
@@ -138,6 +140,7 @@ Every parameter is a property: `g.input`, `g.input = ...`. These also work by na
 | [examples/growl-demo.scd](examples/growl-demo.scd) | a walkthrough, one block at a time |
 | [install.scd](install.scd) | the symlink, a check, an uninstall |
 | [sc-growl.quark](sc-growl.quark) | the quark manifest |
+| [images/](images/) | the screenshots in this README |
 
 ## License
 
